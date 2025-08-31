@@ -1,0 +1,26 @@
+# Go: binários e artefatos de build
+/bin/
+/build/
+/dist/
+/out/
+/coverage/
+*.so
+*.dylib
+*.test
+*.out
+
+go.work
+go.work.sum
+
+# Arquivos de ambiente e segredos
+.env
+
+# VS Code
+.vscode/
+# JetBrains (GoLand, IntelliJ, etc.)
+.idea/
+# Outros
+*.iml
+
+.DS_Store
+Thumbs.db

@@ -192,6 +192,8 @@ func (s *Server) delete(w http.ResponseWriter, r *http.Request) {
 	if item != nil {
 		name = item.NomeFantasia
 	}
-	_ = s.pub.Publish("Exclusão da EMPRESA " + name)
+	if s.pub != nil {
+		_ = s.pub.Publish("Exclusão da EMPRESA " + name)
+	}
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }

@@ -15,6 +15,7 @@ API RESTful para cadastro e gestão de empresas. Persistência em MongoDB e publ
 - [Rodando com Docker](#rodando-com-docker)
 - [Execução Local](#execução-local)
 - [Endpoints](#endpoints)
+- [WebSocket de Eventos](#websocket-de-eventos)
 - [Exemplos de Requisição](#exemplos-de-requisição)
 - [Modelo de Erros](#modelo-de-erros)
 - [Observabilidade](#observabilidade)
@@ -45,11 +46,13 @@ Observação: Garanta consistência entre o base path documentado (ex.: /api/emp
 ## Rodando com Docker
 1) docker compose up --build
 2) API disponível em http://localhost:8080/api/empresas (ajuste se não usar base path /api)
-3) MongoDB: localhost:27017
-4) RabbitMQ Management: http://localhost:15672 (guest/guest)
+3) WebSocket de eventos em ws://localhost:8090/ws/events
+4) MongoDB: localhost:27017
+5) RabbitMQ Management: http://localhost:15672 (guest/guest)
 
 ## Execução Local
-- go run ./cmd/server
+- API: go run ./cmd/server
+- WS:  go run ./cmd/wsserver
 - Defina as variáveis de ambiente (use `.env` opcionalmente)
 
 ## Endpoints
@@ -139,6 +142,18 @@ Principais códigos:
 - Logs: o serviço escreve logs padrão na saída do processo.
 - RabbitMQ: quando configurado, publica mensagens como "Cadastro/Edição/Exclusão da EMPRESA <nome_fantasia>".
 - MongoDB: dados persistidos na coleção configurada (ex.: empresas).
+
+## WebSocket de Eventos
+- Serviço dedicado que consome a fila RabbitMQ (padrão: logs.empresas) e transmite cada mensagem para todos os clientes conectados.
+- Endpoint: ws://localhost:8090/ws/events
+- Protocolo: WebSocket (texto). Cada evento do RabbitMQ é enviado como uma mensagem de texto ao cliente.
+- Variáveis de ambiente (WS):
+  - WS_HTTP_ADDR (default :8090)
+  - RABBITMQ_URL (default amqp://guest:guest@rabbitmq:5672/)
+  - RABBITMQ_QUEUE (default logs.empresas)
+- Teste rápido:
+  - Conecte com: `wscat -c ws://localhost:8090/ws/events` ou use qualquer cliente WebSocket.
+  - Realize operações na API (criar/editar/excluir empresa) e observe as mensagens chegarem em tempo real.
 
 ## Testes
 - Rode os testes: go test ./...

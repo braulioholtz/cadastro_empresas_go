@@ -2,6 +2,7 @@ version: "3.9"
 services:
   app:
     build: .
+    command: ["server"]
     ports:
       - "8080:8080"
     environment:
@@ -11,7 +12,20 @@ services:
       - MONGODB_COLLECTION=empresas
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
     depends_on:
-      - mongo
+      mongo:
+        condition: service_started
+      rabbitmq:
+        condition: service_healthy
+  ws:
+    build: .
+    command: ["wsserver"]
+    ports:
+      - "8090:8090"
+    environment:
+      - WS_HTTP_ADDR=:8090
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/
+      - RABBITMQ_QUEUE=logs.empresas
+    depends_on:
       - rabbitmq
   mongo:
     image: mongo:6
